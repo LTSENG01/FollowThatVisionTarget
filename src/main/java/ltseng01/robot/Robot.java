@@ -2,6 +2,7 @@ package ltseng01.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
 
-    private static double KP = 0;
+    private static double KP = 0.05;
     private static double KI = 0;
     private static double KD = 0;
     private static final double ROT_TOLERANCE_DEG = 0.5f;
@@ -104,16 +105,34 @@ public class Robot extends TimedRobot {
         // A Button --> Set PID
         if (xboxController.getAButtonPressed()) {
 
-            rotationPIDController.setPID(SmartDashboard.getNumber("Rotation PID KP", 0.0),
-                        SmartDashboard.getNumber("Rotation PID KI", 0.0),
-                        SmartDashboard.getNumber("Rotation PID KD", 0.0));
+
+            KP = SmartDashboard.getNumber("Rotation PID KP", KP);
+            KI = SmartDashboard.getNumber("Rotation PID KI", KI);
+            KD = SmartDashboard.getNumber("Rotation PID KD", KD);
+
+            rotationPIDController.setPID(KP, KI, KD);
+
+            System.out.println("Rotation PID Set to " + KP + ", " + KI + ", " + KD);
+
+            rotationPIDControllerEnabled = true;
+
+        }
+
+        // B Button --> Cancel Rotation PID
+        if (xboxController.getBButtonPressed()) {
+
+            rotationPIDControllerEnabled = false;
+            disableRotationPIDController();
 
         }
 
         if (rotationPIDControllerEnabled) {
 
-            turnToAngle(xboxController.getY(GenericHID.Hand.kLeft),
-                    SmartDashboard.getNumber("Rotation PID Set Angle", 0.0));
+//            double turnAngle = SmartDashboard.getNumber("Rotation PID Set Angle", 0.0);
+            String[] visionInfo = NetworkTableInstance.getDefault().getTable("Vision").getEntry("ball_0").getStringArray(new String[]{""});
+            double turnAngle = Double.parseDouble(visionInfo[4]);
+
+            turnToAngle(xboxController.getY(GenericHID.Hand.kLeft), turnAngle);
 
             if (isRotationPIDControllerOnTarget()) {
                 disableRotationPIDController();
@@ -152,13 +171,10 @@ public class Robot extends TimedRobot {
 
 
     public static void enableRotationPIDController() {
-        System.out.println("Enabled PID Controller");
-        rotationPIDControllerEnabled = true;
         rotationPIDController.enable();
     }
 
     public static void disableRotationPIDController() {
-        System.out.println("Disabled PID Controller");
         rotationPIDControllerEnabled = false;
         rotationPIDController.disable();
     }
