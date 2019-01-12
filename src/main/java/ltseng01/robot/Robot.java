@@ -96,10 +96,12 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
+        // X Button --> reset gyro
         if (xboxController.getXButtonPressed()) {
             resetNavXYaw();
         }
 
+        // A Button --> Set PID
         if (xboxController.getAButtonPressed()) {
 
             rotationPIDController.setPID(SmartDashboard.getNumber("Rotation PID KP", 0.0),
@@ -129,6 +131,14 @@ public class Robot extends TimedRobot {
 
     }
 
+    public static void drive(double speed, double rotation, boolean squared) {
+        differentialDrive.arcadeDrive(speed, rotation, squared);
+    }
+
+    public static void tank_drive(double speed_L, double speed_R, boolean squared) {
+        differentialDrive.tankDrive(speed_L, speed_R);
+    }
+
     // ------------ NAVX METHODS ------------- //
 
     public static void resetNavXYaw() {
@@ -155,22 +165,14 @@ public class Robot extends TimedRobot {
 
     public static boolean isRotationPIDControllerOnTarget() {
         System.out.println("Rotation PID On Target");
-        disableRotationPIDController();
         return rotationPIDController.onTarget();
     }
 
     public static void turnToAngle(double speed, double angle) {
+        System.out.println("Turning to angle: " + angle);
         rotationPIDController.setSetpoint(angle);
         enableRotationPIDController();
         drive(speed, outputTurn/1.5, false);
-    }
-
-    public static void drive(double speed, double rotation, boolean squared) {
-        differentialDrive.arcadeDrive(speed, rotation, squared);
-    }
-
-    public static void tank_drive(double speed_L, double speed_R, boolean squared) {
-        differentialDrive.tankDrive(speed_L, speed_R);
     }
 
 }
