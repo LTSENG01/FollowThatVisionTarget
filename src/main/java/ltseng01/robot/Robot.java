@@ -69,7 +69,6 @@ public class Robot extends TimedRobot {
         rotationPIDController.setContinuous();
         rotationPIDController.disable();
 
-        SmartDashboard.putBoolean("Rotation PID Enabled", rotationPIDControllerEnabled);
         SmartDashboard.putNumber("Rotation PID Set Angle", rotationPIDSetAngle);
         SmartDashboard.putNumber("Rotation PID KP", KP);
         SmartDashboard.putNumber("Rotation PID KI", KI);
@@ -88,6 +87,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         SmartDashboard.putNumber("NavX Yaw", getYawAngle());
+        SmartDashboard.putBoolean("Rotation PID Enabled", rotationPIDControllerEnabled);
     }
 
     /**
@@ -96,22 +96,28 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        if (SmartDashboard.getBoolean("Rotation PID Enabled", false)) {
+        if (xboxController.getXButtonPressed()) {
+            resetNavXYaw();
+        }
 
-            if (!rotationPIDControllerEnabled) {
+        if (xboxController.getAButtonPressed()) {
 
-                rotationPIDController.setPID(SmartDashboard.getNumber("Rotation PID KP", 0.0),
+            rotationPIDController.setPID(SmartDashboard.getNumber("Rotation PID KP", 0.0),
                         SmartDashboard.getNumber("Rotation PID KI", 0.0),
                         SmartDashboard.getNumber("Rotation PID KD", 0.0));
 
-                turnToAngle(xboxController.getY(GenericHID.Hand.kLeft),
-                        SmartDashboard.getNumber("Rotation PID Set Angle", 0.0));
+        }
 
-            }
+        if (rotationPIDControllerEnabled) {
+
+            turnToAngle(xboxController.getY(GenericHID.Hand.kLeft),
+                    SmartDashboard.getNumber("Rotation PID Set Angle", 0.0));
 
             if (isRotationPIDControllerOnTarget()) {
                 disableRotationPIDController();
             }
+
+            enableRotationPIDController();
 
         } else {
 
@@ -126,6 +132,7 @@ public class Robot extends TimedRobot {
     // ------------ NAVX METHODS ------------- //
 
     public static void resetNavXYaw() {
+        System.out.println("Reset gyro!");
         navX.reset();
     }
 
@@ -135,14 +142,20 @@ public class Robot extends TimedRobot {
 
 
     public static void enableRotationPIDController() {
+        System.out.println("Enabled PID Controller");
+        rotationPIDControllerEnabled = true;
         rotationPIDController.enable();
     }
 
     public static void disableRotationPIDController() {
+        System.out.println("Disabled PID Controller");
+        rotationPIDControllerEnabled = false;
         rotationPIDController.disable();
     }
 
     public static boolean isRotationPIDControllerOnTarget() {
+        System.out.println("Rotation PID On Target");
+        disableRotationPIDController();
         return rotationPIDController.onTarget();
     }
 
@@ -154,6 +167,10 @@ public class Robot extends TimedRobot {
 
     public static void drive(double speed, double rotation, boolean squared) {
         differentialDrive.arcadeDrive(speed, rotation, squared);
+    }
+
+    public static void tank_drive(double speed_L, double speed_R, boolean squared) {
+        differentialDrive.tankDrive(speed_L, speed_R);
     }
 
 }
