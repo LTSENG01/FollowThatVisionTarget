@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
 
-    private static double KP = 0.05;
+    private static double KP = 0.28;
     private static double KI = 0;
-    private static double KD = 0;
+    private static double KD = 0.018;
     private static final double ROT_TOLERANCE_DEG = 0.5f;
 
     private static WPI_TalonSRX leftFront;
@@ -128,9 +128,9 @@ public class Robot extends TimedRobot {
 
         if (rotationPIDControllerEnabled) {
 
-//            double turnAngle = SmartDashboard.getNumber("Rotation PID Set Angle", 0.0);
-            String[] visionInfo = NetworkTableInstance.getDefault().getTable("Vision").getEntry("ball_0").getStringArray(new String[]{""});
-            double turnAngle = Double.parseDouble(visionInfo[4]);
+            double turnAngle = SmartDashboard.getNumber("Rotation PID Set Angle", 0.0);
+//            String[] visionInfo = NetworkTableInstance.getDefault().getTable("Vision").getEntry("ball_0").getStringArray(new String[]{""});
+//            double turnAngle = Double.parseDouble(visionInfo[4]);
 
             turnToAngle(xboxController.getY(GenericHID.Hand.kLeft), turnAngle);
 

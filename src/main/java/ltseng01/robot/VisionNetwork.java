@@ -3,31 +3,42 @@ package ltseng01.robot;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class VisionNetwork {
 
     private static NetworkTable visionTable;
 
-    private static ArrayList<String[]> visionData;
-
-    enum VisionData {
-        COUNT(0), OBJECT(1), NUMBER(2), ELEV_ANGLE(3), AZIMUTH(4), DISTANCE(5);
-
-        public int i;
-
-        VisionData(int i) {
-            this.i = i;
-        }
-    }
+    private static HashMap<String, VisionEntity> visionData;
 
     enum VisionType {
         CARGO, PANEL, VISION_TARGET, FLOOR_TAPE;
     }
 
-    public VisionNetwork() {
+    class VisionEntity {
+
+        private int count;
+        private VisionType object_type;
+        private int number;
+        private double elevation_angle;
+        private double azimuth;
+        private double distance;
+
+        public VisionEntity(int count, VisionType object_type, int number, double elevation_angle, double azimuth, double distance) {
+            this.count = count;
+            this.object_type = object_type;
+            this.number = number;
+            this.elevation_angle = elevation_angle;
+            this.azimuth = azimuth;
+            this.distance = distance;
+        }
+
+    }
+
+    static {
 
         visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+        visionData = new HashMap<>();
 
     }
 
@@ -42,5 +53,7 @@ public class VisionNetwork {
 
     // Send start to vision
     // Send stop to vision
+
+    // check if data is stale --> delete
 
 }
