@@ -4,7 +4,7 @@ import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -14,7 +14,7 @@ public class VisionNetwork {
     private static NetworkTable visionTable;
     private static NetworkTable visionDataTable;
 
-    private static volatile HashMap<VisionType, VisionObjectDetails> visionData;
+    private static volatile ConcurrentHashMap<VisionType, VisionObjectDetails> visionData;
 
     enum VisionType {
         CARGO, PANEL, VISION_TARGET, FLOOR_TAPE
@@ -58,7 +58,7 @@ public class VisionNetwork {
         visionTable = NetworkTableInstance.getDefault().getTable("Vision");
         visionDataTable = visionTable.getSubTable("data");
 
-        visionData = new HashMap<>(4);
+        visionData = new ConcurrentHashMap<>(4);
 
 
         // Register NetworkTables Listeners
@@ -87,6 +87,6 @@ public class VisionNetwork {
     // Send start to vision
     // Send stop to vision
 
-    // check if data is stale --> delete?
+    // check if data is stale --> delete? (can use a global latest_count variable and delete when accessing)
 
 }
