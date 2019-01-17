@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VisionNetwork {
 
     private static NetworkTable visionTable;
-    private static NetworkTable visionDataTable;
+    private static NetworkTable visionDataTable;    // for settings and commands to the Jetson
 
     private static volatile ConcurrentHashMap<VisionType, VisionObjectDetails> visionData;
 
@@ -34,22 +34,28 @@ public class VisionNetwork {
             this.distance = distance;
         }
 
-        public int getCount() {
+        int getCount() {
             return count;
         }
 
-        public double getElevationAngle() {
+        double getElevationAngle() {
             return elevationAngle;
         }
 
-        public double getAzimuth() {
+        double getAzimuth() {
             return azimuth;
         }
 
-        public double getDistance() {
+        double getDistance() {
             return distance;
         }
 
+        public String toString() {
+            return "[count: " + getCount() +
+                    ", elevAngle: " + getElevationAngle() +
+                    ", azimuth: " + getAzimuth() +
+                    ", distance: " + getDistance() + "]";
+        }
 
     }
 
@@ -67,12 +73,16 @@ public class VisionNetwork {
 
             visionTable.addEntryListener(type.toString(), (table, key, entry, value, flags) -> {
                 double[] objectValues = value.getDoubleArray();
-                visionData.put(type,
-                        new VisionObjectDetails(
-                                (int) objectValues[0],
-                                objectValues[1],
-                                objectValues[2],
-                                objectValues[3]));
+                VisionObjectDetails details = new VisionObjectDetails(
+                        (int) objectValues[0],
+                        objectValues[1],
+                        objectValues[2],
+                        objectValues[3]);
+
+                visionData.put(type, details);
+
+                System.out.println("DEBUG: Vision Data updated: " + flags + " details: " + details.toString());
+
             }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
         }
@@ -87,6 +97,6 @@ public class VisionNetwork {
     // Send start to vision
     // Send stop to vision
 
-    // check if data is stale --> delete? (can use a global latest_count variable and delete when accessing)
+    // check if data is stale --> delete? (can use a global latest_count variable and delete when accessing or periodically)
 
 }
