@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -89,9 +90,20 @@ public class VisionNetwork {
 
     }
 
-    public static VisionObjectDetails getVisionObjectDetails(VisionType visionType) {
+    public static VisionObjectDetails readVisionObjectDetails(VisionType visionType) {
         return visionData.get(visionType);
     }
+
+    public static void setVisionTypes(VisionType... visionTypes) {
+
+        String[] vt = Arrays.stream(visionTypes)
+                .map(Enum::toString)
+                .toArray(String[]::new);
+
+        visionDataTable.getEntry("visionTypes").setStringArray(vt);
+
+    }
+
 
 
     // Send start to vision
