@@ -8,19 +8,48 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Handles the communication between a vision co-processor over NetworkTables and the robot.
+ *
+ * @author Larry Tseng
  *
  */
 public class VisionNetwork {
 
-    private static NetworkTable visionTable;
-    private static NetworkTable visionDataTable;    // for settings and commands to the Jetson
+    private static NetworkTable visionTable;    // reference to the Vision NetworkTables table
+    private static NetworkTable visionSettingsTable;    // for settings and commands to the Jetson
 
-    private static volatile ConcurrentHashMap<VisionType, VisionObjectDetails> visionData;
+    private static volatile ConcurrentHashMap<VisionType, VisionObjectDetails> visionData;  // dictionary for local storage of vision values
 
+    /**
+     * Items that can be chosen for vision tracking
+     */
     enum VisionType {
-        CARGO, PANEL, VISION_TARGET, FLOOR_TAPE
+
+        /**
+         * CARGO game piece
+         */
+        CARGO,
+
+        /**
+        * HATCH PANEL game piece
+        */
+        PANEL,
+
+        /**
+        * Reflective tape vision targets
+        */
+        TARGET,
+
+        /**
+        * Floor gaffer tape alignment lines
+        */
+        TAPE
+
     }
 
+    /**
+     * Nested inner class that structures the vision item's data.
+     */
     static class VisionObjectDetails {
 
         private int count;
@@ -63,7 +92,7 @@ public class VisionNetwork {
     static {
 
         visionTable = NetworkTableInstance.getDefault().getTable("Vision");
-        visionDataTable = visionTable.getSubTable("data");
+        visionSettingsTable = visionTable.getSubTable("settings");
 
         visionData = new ConcurrentHashMap<>(4);
 
@@ -90,22 +119,29 @@ public class VisionNetwork {
 
     }
 
+    /**
+     * @param visionType
+     * @return
+     */
     public static VisionObjectDetails readVisionObjectDetails(VisionType visionType) {
         return visionData.get(visionType);
     }
 
+    /**
+     * @param visionTypes
+     */
     public static void setVisionTypes(VisionType... visionTypes) {
 
         String[] vt = Arrays.stream(visionTypes)
                 .map(Enum::toString)
                 .toArray(String[]::new);
 
-        visionDataTable.getEntry("visionTypes").setStringArray(vt);
+        visionSettingsTable.getEntry("vision_types").setStringArray(vt);
 
     }
 
 
-
+    // TODO
     // Send start to vision
     // Send stop to vision
 

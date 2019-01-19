@@ -2,10 +2,11 @@ package ltseng01.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import static ltseng01.robot.VisionNetwork.VisionType.*;
 
 /**
  *
@@ -74,6 +75,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Rotation PID KP", KP);
         SmartDashboard.putNumber("Rotation PID KI", KI);
         SmartDashboard.putNumber("Rotation PID KD", KD);
+
+        VisionNetwork.setVisionTypes(CARGO, PANEL, TARGET, TAPE);   // set to receive all items
 
     }
 
