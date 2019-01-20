@@ -100,56 +100,58 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        // X Button --> reset gyro
-        if (xboxController.getXButtonPressed()) {
-            resetNavXYaw();
-        }
+//        // X Button --> reset gyro
+//        if (xboxController.getXButtonPressed()) {
+//            resetNavXYaw();
+//        }
+//
+//        // A Button --> Set PID
+//        if (xboxController.getAButtonPressed()) {
+//
+//
+//            KP = SmartDashboard.getNumber("Rotation PID KP", KP);
+//            KI = SmartDashboard.getNumber("Rotation PID KI", KI);
+//            KD = SmartDashboard.getNumber("Rotation PID KD", KD);
+//
+//            rotationPIDController.setPID(KP, KI, KD);
+//
+//            System.out.println("Rotation PID Set to " + KP + ", " + KI + ", " + KD);
+//
+//            rotationPIDControllerEnabled = true;
+//
+//        }
+//
+//        // B Button --> Cancel Rotation PID
+//        if (xboxController.getBButtonPressed()) {
+//
+//            rotationPIDControllerEnabled = false;
+//            disableRotationPIDController();
+//
+//        }
+//
+//        if (rotationPIDControllerEnabled) {
+//
+//            double turnAngle = SmartDashboard.getNumber("Rotation PID Set Angle", 0.0);
+////            String[] visionInfo = NetworkTableInstance.getDefault().getTable("Vision").getEntry("ball_0").getStringArray(new String[]{""});
+////            double turnAngle = Double.parseDouble(visionInfo[4]);
+//
+//            turnToAngle(xboxController.getY(GenericHID.Hand.kLeft), turnAngle);
+//
+//            if (isRotationPIDControllerOnTarget()) {
+//                disableRotationPIDController();
+//            }
+//
+//            enableRotationPIDController();
+//
+//        } else {
+//
+//            drive(xboxController.getY(GenericHID.Hand.kLeft),
+//                    xboxController.getX(GenericHID.Hand.kRight),
+//                    false);
+//
+//        }
 
-        // A Button --> Set PID
-        if (xboxController.getAButtonPressed()) {
-
-
-            KP = SmartDashboard.getNumber("Rotation PID KP", KP);
-            KI = SmartDashboard.getNumber("Rotation PID KI", KI);
-            KD = SmartDashboard.getNumber("Rotation PID KD", KD);
-
-            rotationPIDController.setPID(KP, KI, KD);
-
-            System.out.println("Rotation PID Set to " + KP + ", " + KI + ", " + KD);
-
-            rotationPIDControllerEnabled = true;
-
-        }
-
-        // B Button --> Cancel Rotation PID
-        if (xboxController.getBButtonPressed()) {
-
-            rotationPIDControllerEnabled = false;
-            disableRotationPIDController();
-
-        }
-
-        if (rotationPIDControllerEnabled) {
-
-            double turnAngle = SmartDashboard.getNumber("Rotation PID Set Angle", 0.0);
-//            String[] visionInfo = NetworkTableInstance.getDefault().getTable("Vision").getEntry("ball_0").getStringArray(new String[]{""});
-//            double turnAngle = Double.parseDouble(visionInfo[4]);
-
-            turnToAngle(xboxController.getY(GenericHID.Hand.kLeft), turnAngle);
-
-            if (isRotationPIDControllerOnTarget()) {
-                disableRotationPIDController();
-            }
-
-            enableRotationPIDController();
-
-        } else {
-
-            drive(xboxController.getY(GenericHID.Hand.kLeft),
-                    xboxController.getX(GenericHID.Hand.kRight),
-                    false);
-
-        }
+        drive(0, 0, false);
 
     }
 

@@ -17,6 +17,8 @@ public class VisionNetwork {
 
     private static NetworkTable visionTable;    // reference to the Vision NetworkTables table
     private static NetworkTable visionSettingsTable;    // for settings and commands to the Jetson
+    private static int latestCount;    // the latest global data count
+    private static final int MAX_DELTA_COUNT = 10;  // the maximum count difference before objects are outdated
 
     private static volatile ConcurrentHashMap<VisionType, VisionObjectDetails> visionData;  // dictionary for local storage of vision values
 
@@ -45,6 +47,10 @@ public class VisionNetwork {
         */
         TAPE
 
+    }
+
+    enum VisionCommand {
+        START, STOP, RESTART
     }
 
     /**
@@ -102,9 +108,14 @@ public class VisionNetwork {
         for (VisionType type : VisionType.values()) {
 
             visionTable.addEntryListener(type.toString(), (table, key, entry, value, flags) -> {
-                double[] objectValues = value.getDoubleArray();
+
+                String[] stringArray = value.getStringArray();
+                Double[] objectValues = Arrays.stream(stringArray)
+                        .map(Double::parseDouble)
+                        .toArray(Double[]::new);
+
                 VisionObjectDetails details = new VisionObjectDetails(
-                        (int) objectValues[0],
+                        objectValues[0].intValue(),
                         objectValues[1],
                         objectValues[2],
                         objectValues[3]);
@@ -117,13 +128,25 @@ public class VisionNetwork {
 
         }
 
+        visionSettingsTable.addEntryListener("count", (table, key, entry, value, flags) -> {
+
+            latestCount = (int) value.getDouble();
+            System.out.println("DEBUG: Vision Data updated: count = " + value);
+
+        }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
     }
 
     /**
      * @param visionType
      * @return
      */
-    public static VisionObjectDetails readVisionObjectDetails(VisionType visionType) {
+    public static VisionObjectDetails readVisionObjectDetails(VisionType visionType, boolean checkIfOutdated) {
+
+        if (checkIfOutdated) {
+
+        }
+
         return visionData.get(visionType);
     }
 
@@ -140,11 +163,20 @@ public class VisionNetwork {
 
     }
 
+    public static void setVisionStatus(VisionCommand visionCommand) {
+        visionSettingsTable.getEntry("status").setString(visionCommand.toString());
+    }
+
+    // Keep-alive
+
+
 
     // TODO
     // Send start to vision
     // Send stop to vision
 
-    // check if data is stale --> delete? (can use a global latest_count variable and delete when accessing or periodically)
+    // check if data is stale (can use a global latest_count variable and delete when accessing or periodically)
+        // No need for deletion
+
 
 }
