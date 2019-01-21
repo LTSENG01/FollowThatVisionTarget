@@ -5,10 +5,11 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Handles the communication between a vision co-processor over NetworkTables and the robot.
+ * Handles the communication between a vision co-processor over NetworkTables and the robot for the 2019 FRC season.
  *
  * @author Larry Tseng
  *
@@ -141,13 +142,33 @@ public class VisionNetwork {
      * @param visionType
      * @return
      */
-    public static VisionObjectDetails readVisionObjectDetails(VisionType visionType, boolean checkIfOutdated) {
+    public static Optional<VisionObjectDetails> getVisionObjectDetails(VisionType visionType) {
 
-        if (checkIfOutdated) {
+        Optional<VisionObjectDetails> details = Optional.ofNullable(visionData.get(visionType));    // since HashMap returns null if no element exists
 
+        // if VOD is outdated, remove it from the HashMap
+        if (details.isPresent()) {
+            if (isOutdated(latestCount, details.get().getCount())) {
+                visionData.remove(visionType);
+            }
         }
 
-        return visionData.get(visionType);
+        return details;
+
+    }
+
+    private static boolean isOutdated(int globalCount, int countToCheck) {
+        return globalCount > countToCheck + MAX_DELTA_COUNT;
+    }
+
+    public static Optional<Double> getAzimuth(VisionType visionType) {
+        return getVisionObjectDetails(visionType)
+                .map(VisionObjectDetails::getAzimuth);      // return azimuth ifPresent, otherwise empty
+    }
+
+    public static Optional<Double> getDistance(VisionType visionType) {
+        return getVisionObjectDetails(visionType)
+                .map(VisionObjectDetails::getDistance);
     }
 
     /**

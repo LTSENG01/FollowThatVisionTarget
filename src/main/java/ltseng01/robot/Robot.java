@@ -196,4 +196,26 @@ public class Robot extends TimedRobot {
         drive(speed, outputTurn/1.5, false);
     }
 
+
+    // ------------ VISION METHODS ------------- //
+
+    public static void applyVisionAngle(VisionNetwork.VisionType visionType, double speed) {
+        VisionNetwork.getAzimuth(visionType)
+                .ifPresentOrElse(angle -> turnToAngle(speed, angle),
+                        () -> System.out.println("ERROR: No azimuth found for: " + visionType.toString()));     // Error handling
+    }
+
+    public static void fullTargetedDriving(VisionNetwork.VisionType visionType) {
+        VisionNetwork.getAzimuth(visionType)
+                .ifPresentOrElse(angle -> turnToAngle(
+                        distanceToSpeed(VisionNetwork.getDistance(visionType)
+                                .orElse((double) 0)), angle),
+                        () -> System.out.println("ERROR: Cannot complete FTD for: " + visionType.toString()));     // Error handling
+    }
+
+    public static double distanceToSpeed(double distance) {
+        return distance;
+    }
+
+
 }
